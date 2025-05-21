@@ -1,6 +1,5 @@
 const cors = require("cors");
 require("dotenv").config();
-const serverless = require("serverless-http");
 const express = require("express");
 const app = express();
 
@@ -116,5 +115,3 @@ async function startServer() {
 // Start the server
 startServer();
 
-// module.exports = app;
-// module.exports.handler = serverless(app);
