@@ -5,6 +5,6 @@ buildCommand = "npm install"
 [deploy]
 startCommand = "node index.js"
 healthcheckPath = "/"
-healthcheckTimeout = 100
+healthcheckTimeout = 300
 restartPolicy = "on-failure"
 maxRetries = 10 
