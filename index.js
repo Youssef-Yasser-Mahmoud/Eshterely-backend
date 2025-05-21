@@ -3,14 +3,6 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
-// Log environment variables (without sensitive data)
-console.log("Environment Check:");
-console.log("NODE_ENV:", process.env.NODE_ENV);
-console.log("PORT:", process.env.PORT);
-console.log("DB_NAME:", process.env.DB_NAME);
-console.log("MONGODB_URI exists:", !!process.env.MONGODB_URI);
-console.log("RAILWAY_PUBLIC_DOMAIN:", process.env.RAILWAY_PUBLIC_DOMAIN);
-
 // Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
