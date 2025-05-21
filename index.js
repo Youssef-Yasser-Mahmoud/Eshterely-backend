@@ -46,7 +46,7 @@ require("./startup/routes")(app);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   const url = process.env.RAILWAY_PUBLIC_DOMAIN
-    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+    ? `${process.env.RAILWAY_PUBLIC_DOMAIN}`
     : `http://localhost:${PORT}`;
   console.log(`Server running at: ${url}`);
 });
