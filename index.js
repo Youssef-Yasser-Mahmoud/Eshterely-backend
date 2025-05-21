@@ -4,13 +4,37 @@ const serverless = require("serverless-http");
 const express = require("express");
 const app = express();
 
+// CORS configuration
+const allowedOrigins = [
+  "http://localhost:3000", // Your local frontend
+  "https://your-frontend-domain.com", // Your production frontend
+  process.env.RAILWAY_PUBLIC_DOMAIN, // Railway domain
+  // Add more allowed origins as needed
+];
+
 app.use(
   cors({
-    origin: "*",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"],
+    credentials: true,
   })
 );
+
+// Health check endpoint for Railway
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is running" });
+});
 
 require("./startup/prod")(app);
 require("./startup/db")();
@@ -21,5 +45,8 @@ require("./startup/routes")(app);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  const url = process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+    : `http://localhost:${PORT}`;
+  console.log(`Server running at: ${url}`);
 });
