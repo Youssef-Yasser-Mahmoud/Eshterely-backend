@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 module.exports = function () {
-  if (!process.env.MONGO_URI) {
-    console.error("MONGO_URI is not defined in environment variables");
+  if (!process.env.MONGODB_URI) {
+    console.error("MONGODB_URI is not defined in environment variables");
     process.exit(1);
   }
 
@@ -12,7 +12,7 @@ module.exports = function () {
   }
 
   mongoose
-    .connect(process.env.MONGO_URI, {
+    .connect(process.env.MONGODB_URI, {
       dbName: process.env.DB_NAME,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
