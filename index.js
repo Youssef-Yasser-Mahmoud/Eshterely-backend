@@ -14,10 +14,10 @@ app.use(
 
 require("./startup/prod")(app);
 require("./startup/db")();
-// require('./startup/routes')(app);
+require("./startup/routes")(app);
 
-module.exports = app;
-module.exports.handler = serverless(app);
+// module.exports = app;
+// module.exports.handler = serverless(app);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
