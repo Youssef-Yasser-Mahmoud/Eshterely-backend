@@ -1,35 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const speakerController = require("../controllers/speakersController");
-const { validateSpeaker } = require("../validations/speakers.validation");
-const {
-  isAuthenticated,
-  isAdmin,
-  logRequest,
-} = require("../middlewares/speakers");
 
 // Apply request logging to all routes
-router.use(logRequest);
+// router.use(logRequest);
 
+// Get all speakers
 router.get("/", speakerController.getAllSpeakers);
 
+// Get speaker by ID
 router.get("/:id", speakerController.getSpeakerById);
 
+// Create new speaker
 router.post("/", speakerController.createSpeaker);
 
-router.put(
-  "/:id",
-  isAuthenticated,
-  isAdmin,
-  validateSpeaker,
-  speakerController.updateSpeaker
-);
+// Update speaker
+router.put("/:id", speakerController.updateSpeaker);
 
-router.delete(
-  "/:id",
-  isAuthenticated,
-  isAdmin,
-  speakerController.deleteSpeaker
-);
+// Delete speaker
+router.delete("/:id", speakerController.deleteSpeaker);
 
 module.exports = router;
