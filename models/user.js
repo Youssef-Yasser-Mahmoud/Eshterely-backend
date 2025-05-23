@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema({
     maxlength: 255,
   },
   password: { type: String, required: true, minlength: 5, maxlength: 255 },
-  phone: { type: String, required: true, minlength: 10, maxlength: 15 },
   isAdmin: { type: Boolean, default: false },
   resetToken: { type: String, default: null },
   resetTokenExpiry: { type: Date, default: null },

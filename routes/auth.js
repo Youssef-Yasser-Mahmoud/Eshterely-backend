@@ -21,7 +21,6 @@ router.post("/register", async (req, res) => {
     last_name: req.body.last_name,
     email: req.body.email,
     password: req.body.password,
-    phone: req.body.phone,
   });
 
   const salt = await bcrypt.genSalt(10);
@@ -36,7 +35,6 @@ router.post("/register", async (req, res) => {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      phone: user.phone,
     },
   });
 });
@@ -65,7 +63,6 @@ router.post("/login", async (req, res) => {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      phone: user.phone,
       isAdmin: user.isAdmin,
     },
   });

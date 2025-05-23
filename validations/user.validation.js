@@ -28,17 +28,6 @@ const userValidationSchema = {
       minLength: 5,
       maxLength: 20,
     },
-    phone: {
-      type: "string",
-      minLength: 10,
-      maxLength: 15,
-    },
-    wishlist: {
-      type: "array",
-      items: {
-        type: "string",
-      },
-    },
   },
   required: ["first_name", "last_name", "email", "password", "phone"],
   additionalProperties: false,
