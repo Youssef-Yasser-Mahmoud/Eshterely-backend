@@ -22,7 +22,7 @@ app.use((err, req, res, next) => {
 
 // CORS configuration
 const allowedOrigins = [
-  "http://localhost:3000", // Your local frontend
+  "http://localhost:5173", // Your local frontend
   process.env.RAILWAY_PUBLIC_DOMAIN
     ? process.env.RAILWAY_PUBLIC_DOMAIN.replace(/\/$/, "")
     : null,
@@ -106,4 +106,3 @@ async function startServer() {
 
 // Start the server
 startServer();
-
