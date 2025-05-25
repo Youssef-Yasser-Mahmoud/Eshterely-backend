@@ -90,7 +90,7 @@ router.post("/forgot-password", async (req, res) => {
     await user.save();
 
     // Generate the reset link
-    const resetLink = `http://localhost:5000/reset-password/${resetToken}`;
+    const resetLink = `https://eshtrely.netlify.app/reset-password/${resetToken}`;
 
     // Send email with the reset link
     await sendResetEmail(user.email, resetLink);
