@@ -27,11 +27,11 @@ app.use((err, req, res, next) => {
 
 // CORS configuration
 const allowedOrigins = [
-  "http://localhost:5173", // Your local frontend
+  "http://localhost:5173",
+  "https://eshtrely.netlify.app",
   process.env.RAILWAY_PUBLIC_DOMAIN
     ? process.env.RAILWAY_PUBLIC_DOMAIN.replace(/\/$/, "")
     : null,
-  // Add more allowed origins as needed
 ].filter(Boolean);
 
 console.log("Allowed origins:", allowedOrigins);
