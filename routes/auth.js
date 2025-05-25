@@ -71,22 +71,32 @@ router.post("/login", async (req, res) => {
 // Forgot password
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: "Email is required" });
 
   try {
+    // Validate the email
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "User not found" });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: "User with this email does not exist" });
+    }
 
+    // Generate and save the reset token
     const resetToken = user.generatePasswordResetToken();
     await user.save();
 
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    // Generate the reset link
+    const resetLink = `http://localhost:5000/reset-password/${resetToken}`;
+
+    // Send email with the reset link
     await sendResetEmail(user.email, resetLink);
 
-    res.json({ message: "Password reset link sent to your email" });
+    res.status(200).json({ message: "Password reset link sent to your email" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("Forgot password error:", error);
+    res
+      .status(500)
+      .json({ error: "Something went wrong", details: error.message });
   }
 });
 

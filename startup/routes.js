@@ -4,6 +4,7 @@ const headphones = require("../routes/headphones");
 const soundbars = require("../routes/soundbars");
 const user = require("../routes/users");
 const auth = require("../routes/auth");
+const cart = require("../routes/cart");
 const express = require("express");
 
 module.exports = function (app) {
@@ -14,4 +15,5 @@ module.exports = function (app) {
   app.use("/api/televisions", televisions);
   app.use("/api/headphones", headphones);
   app.use("/api/soundbars", soundbars);
+  app.use("/api/cart", cart);
 };
