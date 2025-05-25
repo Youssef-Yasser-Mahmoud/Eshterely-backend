@@ -3,6 +3,11 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
+
 // Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

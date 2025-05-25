@@ -8,6 +8,10 @@ const User = require("../models/user");
 const { validateUser } = require("../validations/user.validation");
 const { sendResetEmail } = require("../services/emailService");
 
+const { OAuth2Client } = require("google-auth-library");
+const auth = require("../middlewares/auth");
+const client = new OAuth2Client(process.env.CLIENT_ID);
+
 // Register new user
 router.post("/register", async (req, res) => {
   const { error } = validateUser(req.body);
@@ -127,6 +131,52 @@ router.post("/reset-password/:token", async (req, res) => {
   await user.save();
 
   res.json({ message: "Password successfully reset" });
+});
+
+// google login
+router.post("/google", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        first_name: payload.given_name,
+        last_name: payload.family_name,
+        email: payload.email,
+        password: crypto.randomBytes(20).toString("hex"),
+      });
+      await user.save();
+    }
+
+    const jwtToken = user.generateAuthToken();
+
+    res.json({
+      token: jwtToken,
+      user: {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    });
+  } catch (err) {
+    console.error("Google login error:", err);
+    res.status(401).json({
+      error: "Invalid token",
+      details: err.message,
+    });
+  }
 });
 
 module.exports = router;
