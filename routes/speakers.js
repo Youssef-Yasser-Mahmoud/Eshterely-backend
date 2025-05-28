@@ -15,7 +15,7 @@ router.get("/:id", speakerController.getSpeakerById);
 router.post("/", speakerController.createSpeaker);
 
 // Update speaker
-router.put("/:id", speakerController.updateSpeaker);
+router.patch("/:id", speakerController.updateSpeaker);
 
 // Delete speaker
 router.delete("/:id", speakerController.deleteSpeaker);

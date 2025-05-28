@@ -106,7 +106,6 @@ const speakerSchema = {
     "hero_section_2",
     "details",
   ],
-  additionalProperties: false,
 };
 
 const validateSpeaker = ajv.compile(speakerSchema);
