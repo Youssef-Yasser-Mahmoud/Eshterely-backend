@@ -6,7 +6,7 @@ const soundbarSchema = {
   properties: {
     name: { type: "string", minLength: 1 },
     category: { type: "string", minLength: 1 },
-    sub_category: { type: "string", minLength: 1 },
+    sub_category: { type: "string" },
     image: { type: "string", format: "uri" },
     price: { type: "string", pattern: "^[0-9]+$" },
     is_new: { type: "boolean" },
@@ -106,7 +106,6 @@ const soundbarSchema = {
     "hero_section_2",
     "details",
   ],
-  additionalProperties: false,
 };
 
 const validateSoundbar = ajv.compile(soundbarSchema);

@@ -12,7 +12,7 @@ router.get("/:id", soundbarController.getSoundbarById);
 router.post("/", soundbarController.createSoundbar);
 
 // Update soundbar
-router.put("/:id", soundbarController.updateSoundbar);
+router.patch("/:id", soundbarController.updateSoundbar);
 
 // Delete soundbar
 router.delete("/:id", soundbarController.deleteSoundbar);

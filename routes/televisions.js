@@ -14,7 +14,7 @@ router.get("/:id", televisionsController.getTelevisionById);
 router.post("/", televisionsController.CreateTelevision);
 
 // Update television
-router.put("/:id", televisionsController.updateTelevision);
+router.patch("/:id", televisionsController.updateTelevision);
 
 // Delete television
 router.delete("/:id", [auth, admin], televisionsController.deleteTelevision);

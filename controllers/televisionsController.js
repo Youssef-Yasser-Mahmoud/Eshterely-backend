@@ -43,8 +43,26 @@ exports.CreateTelevision = async (req, res) => {
 
 exports.updateTelevision = async (req, res) => {
   try {
-    // Validate the request body
-    const valid = validateTelevision(req.body);
+    const id = req.params.id;
+    const updates = req.body;
+
+    const existingTelevision = await Television.findById(id);
+    if (!existingTelevision) {
+      return res.status(404).json({ message: "Television not found" });
+    }
+
+    // Convert Mongoose document to plain object
+    const originalData = existingTelevision.toObject();
+
+    // Merge updates with original data
+    const merged = {
+      ...originalData,
+      ...updates,
+      category: "televisions", // enforce required field
+      sub_category: "televisions", // enforce required field
+    };
+
+    const valid = validateTelevision(merged);
     if (!valid) {
       return res.status(400).json({
         error: "Invalid television data",
@@ -52,17 +70,12 @@ exports.updateTelevision = async (req, res) => {
       });
     }
 
-    const television = await Television.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const updatedTelevision = await Television.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
 
-    if (!television) {
-      return res.status(404).json({ message: "Television not found" });
-    }
-
-    res.json(television);
+    res.json(updatedTelevision);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
