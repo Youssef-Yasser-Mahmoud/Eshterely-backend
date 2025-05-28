@@ -19,6 +19,7 @@ router.get("/", auth, async (req, res) => {
 router.get("/:id", auth, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -33,6 +34,9 @@ router.get("/:id", auth, async (req, res) => {
 router.post("/", auth, async (req, res) => {
   try {
     const { items, total, shippingInfo } = req.body;
+    console.log("items", items);
+    console.log("total", total);
+    console.log("shippingInfo", shippingInfo);
 
     if (!shippingInfo) {
       return res
