@@ -46,11 +46,41 @@ exports.getSoundbarById = async (req, res) => {
   }
 };
 
-// Update a soundbar
 exports.updateSoundbar = async (req, res) => {
   try {
-    // Validate request body
-    const isValid = validateSoundbar(req.body);
+    const id = req.params.id;
+
+    // Step 1: Find the existing soundbar
+    const existing = await Soundbar.findById(id);
+    if (!existing) {
+      return res.status(404).json({ error: "Soundbar not found" });
+    }
+
+    // Step 2: Clean incoming data (remove empty strings, null, undefined, empty objects)
+    const cleanedData = {};
+    for (const key in req.body) {
+      const value = req.body[key];
+      if (
+        value !== "" &&
+        value !== undefined &&
+        value !== null &&
+        !(typeof value === "object" && Object.keys(value).length === 0)
+      ) {
+        cleanedData[key] = value;
+      }
+    }
+
+    // Step 3: Merge cleaned data into the existing full object
+    const merged = { ...existing.toObject(), ...cleanedData };
+
+    // Step 4: Remove MongoDB metadata before validation
+    delete merged._id;
+    delete merged.__v;
+    delete merged.createdAt;
+    delete merged.updatedAt;
+
+    // Step 5: Validate the merged object
+    const isValid = validateSoundbar(merged);
     if (!isValid) {
       return res.status(400).json({
         error: "Validation failed",
@@ -58,17 +88,15 @@ exports.updateSoundbar = async (req, res) => {
       });
     }
 
-    const soundbar = await Soundbar.findByIdAndUpdate(req.params.id, req.body, {
+    // Step 6: Update only the cleaned fields in the DB
+    const updated = await Soundbar.findByIdAndUpdate(id, cleanedData, {
       new: true,
       runValidators: true,
     });
 
-    if (!soundbar) {
-      return res.status(404).json({ error: "Soundbar not found" });
-    }
-
-    res.status(200).json(soundbar);
+    res.status(200).json(updated);
   } catch (error) {
+    console.error("Update error:", error);
     res.status(500).json({ error: error.message });
   }
 };
