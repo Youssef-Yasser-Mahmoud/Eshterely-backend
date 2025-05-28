@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const orderItemSchema = new mongoose.Schema(
   {
-    itemId: { type: mongoose.Schema.Types.ObjectId, required: true },
-    itemName: { type: String, required: true },
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+    name: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1 },
-    itemPrice: { type: Number, required: true, min: 0 },
+    price: { type: Number, required: true, min: 0 },
   },
   { _id: false }
 );
@@ -20,7 +20,7 @@ const shippingInfoSchema = new mongoose.Schema(
     addressLine2: { type: String },
     city: { type: String, required: true },
     postalCode: { type: String, required: true },
-    mobileNumber: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
   },
   { _id: false }
 );
