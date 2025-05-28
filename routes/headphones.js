@@ -15,7 +15,7 @@ router.get("/:id", headphoneController.getHeadphoneById);
 router.post("/", headphoneController.createHeadphone);
 
 // Update headphone
-router.put("/:id", headphoneController.updateHeadphone);
+router.patch("/:id", headphoneController.updateHeadphone);
 
 // Delete headphone
 router.delete("/:id", headphoneController.deleteHeadphone);

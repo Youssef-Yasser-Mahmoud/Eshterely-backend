@@ -105,7 +105,6 @@ const headphoneSchema = {
     "hero_section_2",
     "details",
   ],
-  additionalProperties: false,
 };
 
 const validateHeadphone = ajv.compile(headphoneSchema);
