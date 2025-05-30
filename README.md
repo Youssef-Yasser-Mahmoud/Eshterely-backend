@@ -183,10 +183,7 @@ All data models are validated using AJV (Another JSON Validator):
 <table>
   <tr>
     <td align="center">
-      <a
-        style="text-decoration: none"
-        href="https://github.com/Youssef-Yasser-Mahmoud"
-      >
+      <a href="https://github.com/Youssef-Yasser-Mahmoud">
         <img
           src="https://avatars.githubusercontent.com/Youssef-Yasser-Mahmoud"
           width="100px;"
