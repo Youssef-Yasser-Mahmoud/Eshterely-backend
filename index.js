@@ -1,25 +1,37 @@
 const cors = require("cors");
 require("dotenv").config();
 const express = require("express");
-const serverless = require("serverless-http");
-
 const app = express();
 
-// Fix Cross-Origin-Opener-Policy
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   next();
 });
 
-// Middleware
+// Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS Configuration
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Error occurred:", err);
+  console.error("Stack trace:", err.stack);
+  res.status(500).json({
+    error: "Something broke!",
+    message:
+      process.env.NODE_ENV === "production"
+        ? "Internal server error"
+        : err.message,
+  });
+});
+
+// CORS configuration
 const allowedOrigins = [
   "http://localhost:5173",
   "https://eshtrely.netlify.app",
-  process.env.RAILWAY_PUBLIC_DOMAIN?.replace(/\/$/, ""),
+  process.env.RAILWAY_PUBLIC_DOMAIN
+    ? process.env.RAILWAY_PUBLIC_DOMAIN.replace(/\/$/, "")
+    : null,
 ].filter(Boolean);
 
 console.log("Allowed origins:", allowedOrigins);
@@ -27,10 +39,16 @@ console.log("Allowed origins:", allowedOrigins);
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      console.log("CORS blocked request from:", origin);
-      return callback(new Error("CORS policy: Origin not allowed"), false);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        console.log("CORS blocked request from:", origin);
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"],
@@ -38,12 +56,12 @@ app.use(
   })
 );
 
-// Health check
+// Health check endpoint for Railway
 app.get("/", (req, res) => {
   try {
     res.status(200).json({
       status: "ok",
-      message: "Serverless Express running on Vercel!",
+      message: "Server is running",
       environment: process.env.NODE_ENV,
       database: process.env.DB_NAME ? "configured" : "not configured",
       timestamp: new Date().toISOString(),
@@ -54,35 +72,42 @@ app.get("/", (req, res) => {
   }
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error("Error occurred:", err);
-  res.status(500).json({
-    error: "Something broke!",
-    message:
-      process.env.NODE_ENV === "production"
-        ? "Internal server error"
-        : err.message,
-  });
-});
+// Initialize application
+async function startServer() {
+  try {
+    console.log("Starting server initialization...");
 
-// Startup logic
-try {
-  console.log("Starting Express app initialization...");
-  require("./startup/prod")(app);
-  require("./startup/db")();
-  require("./startup/routes")(app);
-  console.log("App initialized.");
-} catch (error) {
-  console.error("Startup failed:", error);
+    // Initialize middleware and routes
+    require("./startup/prod")(app);
+    console.log("Production middleware initialized");
+
+    // Initialize database
+    require("./startup/db")();
+    console.log("Database initialization started");
+
+    // Initialize routes
+    require("./startup/routes")(app);
+    console.log("Routes initialized");
+
+    const PORT = process.env.PORT || 5000;
+    const server = app.listen(PORT, () => {
+      const url = process.env.RAILWAY_PUBLIC_DOMAIN
+        ? process.env.RAILWAY_PUBLIC_DOMAIN.replace(/\/$/, "")
+        : `http://localhost:${PORT}`;
+      console.log(`Server running at: ${url}`);
+      console.log("Environment:", process.env.NODE_ENV);
+    });
+
+    // Handle server errors
+    server.on("error", (error) => {
+      console.error("Server error:", error);
+      process.exit(1);
+    });
+  } catch (error) {
+    console.error("Failed to start application:", error);
+    process.exit(1);
+  }
 }
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(5000, () => {
-    console.log("Local server started on port 5000");
-  });
-}
-
-// Export as Serverless Function for Vercel
-module.exports = app;
-module.exports.handler = serverless(app);
+// Start the server
+startServer();
