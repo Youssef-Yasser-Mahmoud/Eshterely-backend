@@ -69,12 +69,18 @@ app.use((err, req, res, next) => {
 // Startup logic
 try {
   console.log("Starting Express app initialization...");
-  require("../startup/prod")(app);
-  require("../startup/db")();
-  require("../startup/routes")(app);
+  require("./startup/prod")(app);
+  require("./startup/db")();
+  require("./startup/routes")(app);
   console.log("App initialized.");
 } catch (error) {
   console.error("Startup failed:", error);
+}
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(5000, () => {
+    console.log("Local server started on port 5000");
+  });
 }
 
 // Export as Serverless Function for Vercel
