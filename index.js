@@ -2,6 +2,7 @@ const cors = require("cors");
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const serverless = require("serverless-http");
 
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
@@ -89,14 +90,14 @@ async function startServer() {
     require("./startup/routes")(app);
     console.log("Routes initialized");
 
-    const PORT = process.env.PORT || 5000;
-    const server = app.listen(PORT, () => {
-      const url = process.env.RAILWAY_PUBLIC_DOMAIN
-        ? process.env.RAILWAY_PUBLIC_DOMAIN.replace(/\/$/, "")
-        : `http://localhost:${PORT}`;
-      console.log(`Server running at: ${url}`);
-      console.log("Environment:", process.env.NODE_ENV);
-    });
+    // const PORT = process.env.PORT || 5000;
+    // const server = app.listen(PORT, () => {
+    //   const url = process.env.RAILWAY_PUBLIC_DOMAIN
+    //     ? process.env.RAILWAY_PUBLIC_DOMAIN.replace(/\/$/, "")
+    //     : `http://localhost:${PORT}`;
+    //   console.log(`Server running at: ${url}`);
+    //   console.log("Environment:", process.env.NODE_ENV);
+    // });
 
     // Handle server errors
     server.on("error", (error) => {
@@ -109,5 +110,9 @@ async function startServer() {
   }
 }
 
+module.exports = app;
+module.exports.handler = serverless(app);
+
 // Start the server
 startServer();
+
