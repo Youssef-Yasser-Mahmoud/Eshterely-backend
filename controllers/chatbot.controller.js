@@ -3,6 +3,7 @@ const Soundbars = require("../models/soundbars.js");
 const Speakers = require("../models/speakers.js");
 const Televisions = require("../models/televisions.js");
 const OpenAI = require("openai");
+const stringSimilarity = require("string-similarity");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,6 +14,7 @@ const openai = new OpenAI({
   },
 });
 
+// FAQs (unchanged)
 const FAQs = [
   {
     q: "Can I reserve a product by adding it to my basket?",
@@ -194,22 +196,47 @@ const handleChatRequest = async (req, res) => {
     }));
 
     // 3️⃣ Search across all product models
-    let product = null;
-
-    const [headphone, soundbar, speaker, tv] = await Promise.all([
-      Headphones.findOne({ $or: orQueries }),
-      Soundbars.findOne({ $or: orQueries }),
-      Speakers.findOne({ $or: orQueries }),
-      Televisions.findOne({ $or: orQueries }),
+    const [headphones, soundbars, speakers, televisions] = await Promise.all([
+      Headphones.find({ $or: orQueries }),
+      Soundbars.find({ $or: orQueries }),
+      Speakers.find({ $or: orQueries }),
+      Televisions.find({ $or: orQueries }),
     ]);
 
-    product = headphone || soundbar || speaker || tv;
+    const allResults = [
+      ...headphones,
+      ...soundbars,
+      ...speakers,
+      ...televisions,
+    ];
 
-    const productInfo = product
-      ? `*${product.title}* - ${product.description}. Price: $${product.price}, Stock: ${product.stock}.`
+    // 4️⃣ Rank by similarity to message
+    let bestMatch = null;
+    let highestScore = 0;
+
+    for (const product of allResults) {
+      if (!product?.title) continue; // skip invalid product
+
+      const score = stringSimilarity.compareTwoStrings(
+        lowerMessage,
+        product.title.toLowerCase()
+      );
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = product;
+      }
+    }
+
+    // 5️⃣ Prepare product info
+    const productInfo = bestMatch
+      ? `*${bestMatch.title || "Unnamed Product"}* - ${
+          bestMatch.description || "No description available"
+        }. Price: $${bestMatch.price ?? "N/A"}, Stock: ${
+          bestMatch.stock ?? "N/A"
+        }.`
       : "No product matched.";
 
-    // 4️⃣ AI Completion
+    // 6️⃣ Get AI response
     const completion = await openai.chat.completions.create({
       model: "mistralai/mistral-7b-instruct:free",
       messages: [
