@@ -6,6 +6,7 @@ const user = require("../routes/users");
 const auth = require("../routes/auth");
 const cart = require("../routes/cart");
 const orders = require("../routes/orders");
+const chatbot = require("../routes/chatbot");
 const express = require("express");
 
 module.exports = function (app) {
@@ -18,4 +19,5 @@ module.exports = function (app) {
   app.use("/api/soundbars", soundbars);
   app.use("/api/cart", cart);
   app.use("/api/orders", orders);
+  app.use("/api/chatbot", chatbot);
 };
